@@ -1,13 +1,18 @@
-import React, { useEffect } from "react";
+import React, { useEffect ,useState} from "react";
 import AuthBg from "../../assets/user/auth-bg.jpg";
 import { NavLink } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useForm } from "react-hook-form";
-import { loginUser, removeError } from "../../redux/reducers/authSlice";
+import { loginUser, removeError,loginWallet } from "../../redux/reducers/authSlice";
 import { useNavigate } from "react-router-dom";
+
+import { useSDK } from "@metamask/sdk-react";
 
 const Login = () => {
   document.title = "Login Page";
+
+  const [account, setAccount] = useState();
+  const { sdk, connected, connecting, provider, chainId } = useSDK();
 
   const { loading, userInfo, error, errMsg } = useSelector(
     (state) => state.auth
@@ -22,6 +27,25 @@ const Login = () => {
       // eslint-disable-next-line
     }
   }, [navigate, userInfo]);
+
+
+  const connect = async () => {
+    try {
+      console.log("Connecting===")
+      const accounts = await sdk?.connect();
+      setAccount(accounts?.[0]);
+      console.log("Connecting===",accounts?.[0])
+
+      let dataWallet = {
+        "account":accounts?.[0]
+      };
+      dispatch(loginWallet(dataWallet))
+
+      navigate("/products");
+    } catch (err) {
+      console.warn("failed to connect..", err);
+    }
+  };
 
   const submitForm = (data) => {
     dispatch(loginUser(data));
@@ -105,9 +129,11 @@ const Login = () => {
                   <span className="sr-only">Loading...</span>
                 </div>
               ) : (
-                <>LOGIN</>
+                <>LOGIN</> 
               )}
             </button>
+
+          
             <br />
             <br />
             <div className="links mt-12 flex flex-wrap justify-between w-full">
@@ -125,7 +151,33 @@ const Login = () => {
                 CREATE NEW ACCOUNT
               </NavLink>
             </div>
+
+              
           </form>
+
+          <button
+              
+              className={
+                "w-full h-12 max-w-lg lg:max-w-none bg-orange rounded-md mt-3 mb-2 text-white flex items-center justify-center lg:w-2/5 border border-orange shadow-[inset_0_0_0_0_#ffede1] hover:shadow-[inset_0_-4rem_0_0_#ffede1] hover:text-orange transition-all duration-300 " +
+                (loading ? "cursor-not-allowed" : "cursor-auto")
+              }
+              disabled={loading}
+
+              onClick={connect}
+            >
+              {loading ? (
+                <div
+                  className=" spinner-border animate-spin inline-block w-4 h-4 border rounded-full"
+                  role="status"
+                >
+                  <span className="sr-only">Loading...</span>
+                </div>
+              ) : (
+                <>METAMASK LOGIN</> 
+              )}
+            </button>
+
+            {account} 
         </div>
       </div>
       Login
