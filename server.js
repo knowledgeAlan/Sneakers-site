@@ -10,9 +10,10 @@ const app = express();
 
 app.use(express.json({ extended: false }));
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 6000;
 
 // ROUTES
+app.use("/api/walletLogin", require("./routes/loginWallet"));
 app.use('/api/auth', require("./routes/auth"));
 app.use("/api/users", require("./routes/user"));
 app.use("/api/products", require("./routes/product"));
@@ -20,6 +21,7 @@ app.use("/api/cart", require("./routes/cart"));
 app.use("/api/orders", require("./routes/order"));
 app.use("/api/address", require("./routes/address"));
 app.use("", require("./routes/stripe"));
+
 
 if (process.env.NODE_ENV === 'production') {
   // Serve static files from the React app         

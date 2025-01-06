@@ -177,5 +177,26 @@ const authSlice = createSlice({
     },
   }
 })
+
+
+export const loginWallet = createAsyncThunk("api/walletLogin", async ({ account}, { rejectWithValue }) => {
+  try {
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }
+    
+    let res = await axios.post("api/walletLogin", { account }, config)
+    let data = res.data
+
+    localStorage.setItem('userToken', data.token)
+    return data
+
+  } catch (err) {
+    return rejectWithValue(err.response.data)
+  }
+}
+)
 export const { removeError, enableUpdate, cancelUpdate, logout } = authSlice.actions
 export default authSlice.reducer
